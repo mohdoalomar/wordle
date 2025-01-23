@@ -236,7 +236,7 @@ const ArabicWordle = () => {
                         className="px-4 py-2 bg-green-600 rounded font-bold
                                  hover:bg-green-500 transition-colors duration-200"
                     >
-                        إدخال
+                        جرب
                     </button>
                     <button
                         onClick={() => handleKeyPress('Backspace')}
