@@ -1,7 +1,7 @@
 // DictionaryLoader.js
 export async function loadDictionary() {
     try {
-        const response = await fetch('/arabic-words.json');
+        const response = await fetch('wordle/arabic-words.json');
         const words = await response.json();
         console.log(`Loaded ${words.length} words from dictionary`);
         return words;
