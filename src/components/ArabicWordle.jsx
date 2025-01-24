@@ -125,41 +125,38 @@ const ArabicWordle = () => {
             setGameState(prev => ({ ...prev, shake: false }));
         }, ANIMATION_DURATION);
     };
-    const getLetterStatus = (letter, position, guess) => {
-        // First, handle exact matches
-        if (gameState.targetWord[position] === letter) {
-            return 'bg-green-500';
-        }
-    
-        // Count occurrences of the letter in the target word
-        const targetLetterCount = [...gameState.targetWord].filter(l => l === letter).length;
+    const evaluateGuess = (guess, targetWord) => {
+        const result = Array(WORD_LENGTH).fill('bg-gray-500');
+        const targetLetters = [...targetWord];
+        const guessLetters = [...guess];
         
-        // If the letter doesn't exist in the target word, return gray
-        if (targetLetterCount === 0) {
-            return 'bg-gray-500';
+        // First pass: Mark all correct letters (green)
+        for (let i = 0; i < WORD_LENGTH; i++) {
+            if (guessLetters[i] === targetLetters[i]) {
+                result[i] = 'bg-green-500';
+                targetLetters[i] = null; // Mark as used in target
+                guessLetters[i] = null; // Mark as processed in guess
+            }
         }
-    
-        // Count correct positions of this letter before current position
-        const correctPositionsBeforeCurrent = [...guess].slice(0, position)
-            .filter((l, i) => l === letter && gameState.targetWord[i] === letter).length;
-    
-        // Count yellow positions of this letter before current position
-        const yellowPositionsBeforeCurrent = [...guess].slice(0, position)
-            .filter((l, i) => l === letter && gameState.targetWord[i] !== letter).length;
-    
-        // If we've already used up all occurrences of this letter, return gray
-        if (correctPositionsBeforeCurrent + yellowPositionsBeforeCurrent >= targetLetterCount) {
-            return 'bg-gray-500';
+        
+        // Second pass: Mark misplaced letters (yellow)
+        for (let i = 0; i < WORD_LENGTH; i++) {
+            if (guessLetters[i] !== null) { // Skip already processed letters
+                const targetIndex = targetLetters.indexOf(guessLetters[i]);
+                if (targetIndex !== -1) {
+                    result[i] = 'bg-yellow-500';
+                    targetLetters[targetIndex] = null; // Mark as used
+                }
+            }
         }
-    
-        // Otherwise, if the letter exists in the target word but not at this position, return yellow
-        if (gameState.targetWord.includes(letter)) {
-            return 'bg-yellow-500';
-        }
-    
-        return 'bg-gray-500';
+        
+        return result;
     };
-
+    
+    const getLetterStatus = (letter, position, guess) => {
+        const statuses = evaluateGuess(guess, gameState.targetWord);
+        return statuses[position];
+    };
     const keyboardLayout = [
         ['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح', 'ج'].reverse(),
         ['ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ك'].reverse(),
