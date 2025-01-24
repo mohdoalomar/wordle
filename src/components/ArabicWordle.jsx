@@ -125,14 +125,38 @@ const ArabicWordle = () => {
             setGameState(prev => ({ ...prev, shake: false }));
         }, ANIMATION_DURATION);
     };
-
     const getLetterStatus = (letter, position, guess) => {
+        // First, handle exact matches
         if (gameState.targetWord[position] === letter) {
             return 'bg-green-500';
         }
+    
+        // Count occurrences of the letter in the target word
+        const targetLetterCount = [...gameState.targetWord].filter(l => l === letter).length;
+        
+        // If the letter doesn't exist in the target word, return gray
+        if (targetLetterCount === 0) {
+            return 'bg-gray-500';
+        }
+    
+        // Count correct positions of this letter before current position
+        const correctPositionsBeforeCurrent = [...guess].slice(0, position)
+            .filter((l, i) => l === letter && gameState.targetWord[i] === letter).length;
+    
+        // Count yellow positions of this letter before current position
+        const yellowPositionsBeforeCurrent = [...guess].slice(0, position)
+            .filter((l, i) => l === letter && gameState.targetWord[i] !== letter).length;
+    
+        // If we've already used up all occurrences of this letter, return gray
+        if (correctPositionsBeforeCurrent + yellowPositionsBeforeCurrent >= targetLetterCount) {
+            return 'bg-gray-500';
+        }
+    
+        // Otherwise, if the letter exists in the target word but not at this position, return yellow
         if (gameState.targetWord.includes(letter)) {
             return 'bg-yellow-500';
         }
+    
         return 'bg-gray-500';
     };
 
